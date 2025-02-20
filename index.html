@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A retro-futuristic terminal-style life tracking application inspired by Fallout Pip-Boy">
+    <title>LIFE: TERMINAL v1.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url('https://i.imgur.com/7v0Q4rT.png') no-repeat center center fixed; /* Retro-futuristic Pip-Boy-like texture */
+            background-size: cover;
+            font-family: 'VT323', monospace; /* Pure terminal font, no bold/italic */
+            color: #ff9900; /* Orange text for retro-futuristic glow */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: 16px; /* Consistent terminal readability */
+            overflow: hidden; /* Prevent scroll overflow for Pip-Boy effect */
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.85); /* Slightly transparent black for Pip-Boy screen */
+            border: 3px groove #ff9900; /* Grooved border for retro-futuristic hardware */
+            padding: 15px;
+            width: 85%;
+            max-width: 850px;
+            box-shadow: 0 0 25px rgba(255, 153, 0, 0.6), inset 0 0 15px rgba(255, 153, 0, 0.4); /* Enhanced glowing edges */
+            position: relative;
+            border-radius: 8px; /* Rounded edges for futuristic feel */
+            animation: terminalPulse 3s infinite alternate; /* Subtle pulsing animation */
+        }
+
+        @keyframes terminalPulse {
+            0% { box-shadow: 0 0 20px rgba(255, 153, 0, 0.5), inset 0 0 10px rgba(255, 153, 0, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(255, 153, 0, 0.8), inset 0 0 20px rgba(255, 153, 0, 0.6); }
+        }
+
+        .terminal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(255, 153, 0, 0.1) 0%, transparent 70%);
+            pointer-events: none; /* Radial glow for Pip-Boy hologram effect */
+        }
+
+        .header {
+            text-align: right;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(255, 153, 0, 0.7); /* Glowing text */
+        }
+
+        .user-info {
+            margin-bottom: 15px;
+            border: 2px groove #ff9900; /* Grooved border for Pip-Boy panel */
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3);
+        }
+
+        .content {
+            display: none;
+            padding: 15px 0;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 15px;
+            border: 2px groove #ff9900; /* Grooved border for Pip-Boy panels */
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.65); /* Darker for depth */
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.2);
+            animation: panelFade 1.5s infinite alternate; /* Subtle fade animation */
+        }
+
+        @keyframes panelFade {
+            0% { box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.2); }
+            100% { box-shadow: inset 0 0 12px rgba(255, 153, 0, 0.4); }
+        }
+
+        .stats-item, .log-group {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-field {
+            width: 70%;
+            margin: 4px 0;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px groove #ff9900;
+            color: #ff9900;
+            font-family: 'VT323', monospace;
+            box-shadow: inset 0 0 6px rgba(255, 153, 0, 0.3);
+            transition: box-shadow 0.3s;
+        }
+
+        .input-field:focus {
+            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.6), 0 0 10px rgba(255, 153, 0, 0.5);
+            outline: none;
+        }
+
+        .log-button, .toggle-button, .complete-day-button {
+            background: #ff6600; /* Brighter orange for Pip-Boy buttons */
+            border: 1px groove #ff9900;
+            padding: 6px 12px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 6px rgba(255, 153, 0, 0.6);
+        }
+
+        .log-button:hover, .toggle-button:hover, .complete-day-button:hover {
+            background: #cc5500; /* Darker orange on hover */
+            box-shadow: 0 0 12px rgba(255, 153, 0, 0.9);
+        }
+
+        .achievements-grid, .daily-achievements-grid, .history-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .achievement, .daily-achievement, .history-entry {
+            background: rgba(0, 0, 0, 0.65);
+            border: 2px groove #ff9900; /* Grooved for Pip-Boy panels */
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3);
+            animation: itemBlink 2s infinite alternate; /* Subtle blink for data entries */
+        }
+
+        @keyframes itemBlink {
+            0% { box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3); }
+            100% { box-shadow: inset 0 0 12px rgba(255, 153, 0, 0.5); }
+        }
+
+        .achievement-progress {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px groove #ff9900;
+            border-radius: 5px;
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3);
+        }
+
+        .tab {
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            padding: 8px 18px;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: inset 0 0 6px rgba(255, 153, 0, 0.2);
+        }
+
+        .tab:hover {
+            background: rgba(51, 51, 51, 0.7);
+            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.5);
+        }
+
+        .tab.active {
+            background: #ff9900;
+            color: #000000;
+            box-shadow: inset 0 0 15px rgba(255, 153, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="header">
+            16:21:26 | 20/02/2025
+        </div>
+
+        <div class="user-info">
+            Name: <span id="userName">Default User</span> | 
+            Age: <span id="userAge">30</span> | 
+            Level: <span id="userLevel">1</span> | 
+            XP: <span id="userXp">0/100</span>
+        </div>
+
+        <div class="tabs">
+            <div class="tab" data-tab="main">MAIN</div>
+            <div class="tab" data-tab="stats">STATS</div>
+            <div class="tab" data-tab="achievements">ACHIEVEMENTS</div>
+            <div class="tab" data-tab="history">HISTORY</div>
+            <div class="tab" data-tab="settings">SETTINGS</div>
+        </div>
+
+        <div class="content main active">
+            <div class="section">
+                <h2>LIFE STATS MONITOR</h2>
+                <div class="stats-item">Sleep Duration: <span id="sleepDuration">8h</span></div>
+                <div class="stats-item">Weight: <span id="weight">78.5</span></div>
+                <div class="stats-item">Steps: <span id="steps">8432</span></div>
+                <div class="stats-item">Calories: <span id="calories">2100</span></div>
+                <div class="stats-item">Screen Time: <span id="screenTime">5.2</span></div>
+                <div class="stats-item">Gym Session: <span id="gymSession">Completed</span></div>
+            </div>
+
+            <div class="section">
+                <h2>INPUT CONSOLE</h2>
+                <div class="log-group">
+                    <input type="text" class="input-field" id="logSleepDuration" placeholder="Sleep Duration (hh)">
+                    <button class="log-button" onclick="logStat('sleepDuration')">LOG</button>
+                </div>
+                <div class="log-group">
+                    <input type="text" class="input-field" id="logWeight" placeholder="Weight">
+                    <button class="log-button" onclick="logStat('weight')">LOG</button>
+                </div>
+                <div class="log-group">
+                    <input type="text" class="input-field" id="logSteps" placeholder="Steps">
+                    <button class="log-button" onclick="logStat('steps')">LOG</button>
+                </div>
+                <div class="log-group">
+                    <input type="text" class="input-field" id="logCalories" placeholder="Calories">
+                    <button class="log-button" onclick="logStat('calories')">LOG</button>
+                </div>
+                <div class="log-group">
+                    <input type="text" class="input-field" id="logScreenTime" placeholder="Screen Time (hrs)">
+                    <button class="log-button" onclick="logStat('screenTime')">LOG</button>
+                </div>
+                <button class="toggle-button" onclick="toggleGymSession()">TOGGLE GYM SESSION</button>
+                <button class="complete-day-button" onclick="completeDay()">COMPLETE DAY</button>
+            </div>
+
+            <div class="section">
+                <h2>DAILY ACHIEVEMENTS</h2>
+                <div class="daily-achievements-grid" id="dailyAchievementsList">
+                    <!-- Daily achievements will be populated via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="content stats">
+            <div class="section">
+                <h2>STATS</h2>
+                <p>Steps: <span id="statsSteps">8432</span> | Calories: <span id="statsCalories">2100</span> | Sleep: <span id="statsSleep">8h</span> | XP: <span id="statsXp">0</span></p>
+            </div>
+        </div>
+
+        <div class="content achievements">
+            <div class="section">
+                <h2>ACHIEVEMENTS</h2>
+                <div class="achievements-grid" id="achievementsList">
+                    <!-- Achievements will be populated via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="content history">
+            <div class="section">
+                <h2>HISTORY</h2>
+                <div class="history-grid" id="historyList">
+                    <!-- History entries will be populated via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="content settings">
+            <div class="section">
+                <h2>SETTINGS</h2>
+                <p>Profile Creation/Update:</p>
+                <input type="text" class="input-field" id="editName" placeholder="Enter/Update Name">
+                <button class="log-button" onclick="updateUserProfile('name')">UPDATE NAME</button>
+                <input type="number" class="input-field" id="editAge" placeholder="Enter/Update Age">
+                <button class="log-button" onclick="updateUserProfile('age')">UPDATE AGE</button>
+                <p>Theme: Dark | Notifications: On</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial data (stored in localStorage as JSON)
+        let userProfile = {
+            name: "Default User",
+            age: 30
+        };
+
+        let stats = {
+            level: 1,
+            xp: 0,
+            maxXp: 100,
+            sleepDuration: "8h",
+            weight: "78.5",
+            steps: "8432",
+            calories: "2100",
+            screenTime: "5.2",
+            gymSession: "Completed",
+            logs: [],
+            dayCompleted: false // Track if the day is marked as finished
+        };
+
+        let achievements = [
+            { name: "Early Bird", status: "IN PROGRESS", progress: 0, target: 7, xp: 20 }, // 7+ days 7-9h sleep
+            { name: "Gym Warrior", status: "IN PROGRESS", progress: 0, target: 5, xp: 25 }, // 5+ gym sessions
+            { name: "Nutrition Master", status: "IN PROGRESS", progress: 0, target: 14, xp: 15 }, // 14+ days 2000+ calories
+            { name: "Step Master", status: "IN PROGRESS", progress: 0, target: 7, xp: 20 }, // 7+ days 10000+ steps
+            { name: "Sleep Guardian", status: "IN PROGRESS", progress: 0, target: 14, xp: 15 }, // 14+ days 7-9h sleep
+            { name: "Digital Wellness", status: "IN PROGRESS", progress: 0, target: 7, xp: 10 } // 7+ days ≤4h screen
+        ];
+
+        let dailyAchievements = [
+            { name: "Morning Jog", status: "IN PROGRESS", xp: 20, condition: steps => parseInt(steps) >= 10000 },
+            { name: "Healthy Meal", status: "IN PROGRESS", xp: 15, condition: calories => parseInt(calories) >= 2000 },
+            { name: "Screen Break", status: "IN PROGRESS", xp: 10, condition: screenTime => parseFloat(screenTime) <= 4 }
+        ];
+
+        let history = []; // Array to store daily history
+
+        // Load or save data to localStorage
+        function loadData() {
+            const savedUser = localStorage.getItem('userProfile');
+            const savedStats = localStorage.getItem('stats');
+            const savedAchievements = localStorage.getItem('achievements');
+            const savedDaily = localStorage.getItem('dailyAchievements');
+            const savedHistory = localStorage.getItem('history');
+            if (savedUser) userProfile = JSON.parse(savedUser);
+            if (savedStats) stats = JSON.parse(savedStats);
+            if (savedAchievements) achievements = JSON.parse(savedAchievements);
+            if (savedDaily) {
+                dailyAchievements = JSON.parse(savedDaily);
+                checkDailyReset();
+            }
+            if (savedHistory) history = JSON.parse(savedHistory);
+            updateDisplay();
+            renderAchievements();
+            renderDailyAchievements();
+            renderHistory();
+        }
+
+        function saveData() {
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            localStorage.setItem('stats', JSON.stringify(stats));
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+            localStorage.setItem('dailyAchievements', JSON.stringify(dailyAchievements));
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        // Check if daily achievements need to reset
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastReset = localStorage.getItem('lastDailyReset');
+            if (lastReset !== today) {
+                dailyAchievements.forEach(ach => ach.status = "IN PROGRESS");
+                stats.logs = []; // Clear daily logs
+                stats.dayCompleted = false; // Reset day completion status
+                localStorage.setItem('lastDailyReset', today);
+                saveData();
+            }
+        }
+
+        // Update display for stats and user info
+        function updateDisplay() {
+            document.getElementById('userName').textContent = userProfile.name || 'Default User';
+            document.getElementById('userAge').textContent = userProfile.age || '30';
+            document.getElementById('userLevel').textContent = stats.level;
+            document.getElementById('userXp').textContent = `${stats.xp}/${stats.maxXp}`;
+            document.getElementById('sleepDuration').textContent = stats.sleepDuration || '8h';
+            document.getElementById('weight').textContent = stats.weight || '--';
+            document.getElementById('steps').textContent = stats.steps || '0';
+            document.getElementById('calories').textContent = stats.calories || '0';
+            document.getElementById('screenTime').textContent = stats.screenTime || '0';
+            document.getElementById('gymSession').textContent = stats.gymSession || 'Not Completed';
+            
+            // Update stats tab
+            document.getElementById('statsSteps').textContent = stats.steps || '0';
+            document.getElementById('statsCalories').textContent = stats.calories || '0';
+            document.getElementById('statsSleep').textContent = stats.sleepDuration || '8h';
+            document.getElementById('statsXp').textContent = stats.xp || '0';
+        }
+
+        // Render achievements with progress
+        function renderAchievements() {
+            const achievementsList = document.getElementById('achievementsList');
+            achievementsList.innerHTML = '';
+            achievements.forEach(ach => {
+                const div = document.createElement('div');
+                div.className = 'achievement';
+                div.innerHTML = `${ach.name}\n${ach.status}\nProgress: ${ach.progress}/${ach.target}`;
+                achievementsList.appendChild(div);
+            });
+        }
+
+        // Render daily achievements
+        function renderDailyAchievements() {
+            const dailyList = document.getElementById('dailyAchievementsList');
+            dailyList.innerHTML = '';
+            dailyAchievements.forEach(ach => {
+                const div = document.createElement('div');
+                div.className = 'daily-achievement';
+                div.innerHTML = `${ach.name} (+${ach.xp} XP)\n${ach.status}`;
+                dailyList.appendChild(div);
+            });
+        }
+
+        // Render history (including today's stats if day is completed)
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            const today = new Date().toDateString();
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toDateString();
+
+            // Show today's stats if day is marked as completed
+            if (stats.dayCompleted) {
+                const todayEntry = {
+                    date: today,
+                    sleepDuration: stats.sleepDuration,
+                    weight: stats.weight,
+                    steps: stats.steps,
+                    calories: stats.calories,
+                    screenTime: stats.screenTime,
+                    gymSession: stats.gymSession
+                };
+                const todayDiv = document.createElement('div');
+                todayDiv.className = 'history-entry';
+                todayDiv.innerHTML = `Date: ${todayEntry.date}\n` +
+                    `Sleep: ${todayEntry.sleepDuration || '8h'}\n` +
+                    `Weight: ${todayEntry.weight || '--'}\n` +
+                    `Steps: ${todayEntry.steps || '0'}\n` +
+                    `Calories: ${todayEntry.calories || '0'}\n` +
+                    `Screen: ${todayEntry.screenTime || '0'}\n` +
+                    `Gym: ${todayEntry.gymSession || 'Not Completed'}`;
+                historyList.appendChild(todayDiv);
+            }
+
+            // Show yesterday's entries
+            const yesterdayEntries = history.filter(entry => entry.date === yesterdayStr);
+            if (yesterdayEntries.length > 0) {
+                yesterdayEntries.forEach(entry => {
+                    const div = document.createElement('div');
+                    div.className = 'history-entry';
+                    div.innerHTML = `Date: ${entry.date}\n` +
+                        `Sleep: ${entry.sleepDuration || '8h'}\n` +
+                        `Weight: ${entry.weight || '--'}\n` +
+                        `Steps: ${entry.steps || '0'}\n` +
+                        `Calories: ${entry.calories || '0'}\n` +
+                        `Screen: ${entry.screenTime || '0'}\n` +
+                        `Gym: ${entry.gymSession || 'Not Completed'}`;
+                    historyList.appendChild(div);
+                });
+            } else if (!stats.dayCompleted) {
+                historyList.innerHTML = 'No history available. Complete the day to save today\'s stats.';
+            }
+        }
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.querySelector(`.content.${tabId}`).classList.add('active');
+                console.log(`Switched to ${tabId} tab at ${new Date().toLocaleTimeString()}`);
+            });
+        });
+
+        // Intuitive logging system (updated for sleep duration only)
+        function logStat(statType) {
+            const inputId = `log${statType.charAt(0).toUpperCase() + statType.slice(1)}`;
+            const value = document.getElementById(inputId).value;
+            if (value) {
+                stats[statType] = value + (statType === 'sleepDuration' ? 'h' : '');
+                stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: statType, value });
+                awardXp(statType === 'steps' ? value : null,
+                        statType === 'calories' ? value : null,
+                        statType === 'screenTime' ? value : null,
+                        statType === 'gymSession' ? stats.gymSession : null,
+                        statType === 'sleepDuration' ? value : null);
+                document.getElementById(inputId).value = '';
+                saveData();
+                updateDisplay();
+                updateAchievements();
+                checkDailyAchievements();
+            }
+        }
+
+        function toggleGymSession() {
+            stats.gymSession = stats.gymSession === "Completed" ? "Not Completed" : "Completed";
+            stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: "gymSession", value: stats.gymSession });
+            awardXp(null, null, null, stats.gymSession);
+            saveData();
+            updateDisplay();
+            updateAchievements();
+            checkDailyAchievements();
+        }
+
+        // Update user profile
+        function updateUserProfile(field) {
+            const inputId = `edit${field.charAt(0).toUpperCase() + field.slice(1)}`;
+            const value = document.getElementById(inputId).value;
+            if (value) {
+                if (field === 'name') userProfile.name = value;
+                else if (field === 'age') userProfile.age = parseInt(value) || userProfile.age;
+                document.getElementById(inputId).value = '';
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        // Complete day and save history
+        function completeDay() {
+            const today = new Date().toDateString();
+            const dailyEntry = {
+                date: today,
+                sleepDuration: stats.sleepDuration,
+                weight: stats.weight,
+                steps: stats.steps,
+                calories: stats.calories,
+                screenTime: stats.screenTime,
+                gymSession: stats.gymSession
+            };
+            history.push(dailyEntry);
+            stats.logs = []; // Clear daily logs
+            stats.dayCompleted = true; // Mark day as completed
+            checkDailyReset(); // Reset daily achievements
+            saveData();
+            updateDisplay();
+            renderHistory();
+        }
+
+        // Calculate sleep duration (simplified for logging, no wake/sleep time needed)
+        function calculateSleepDuration(duration) {
+            return duration + 'h'; // Assume input is hours, append 'h' for consistency
+        }
+
+        // Award XP and update achievements
+        function awardXp(steps = null, calories = null, screenTime = null, gymSession = null, sleepDuration = null) {
+            let xpGain = 0;
+            if (steps && parseInt(steps) >= 10000) xpGain += 20; // Step Master
+            if (calories && parseInt(calories) >= 2000) xpGain += 15; // Nutrition
+            if (screenTime && parseFloat(screenTime) <= 4) xpGain += 10; // Digital Wellness
+            if (gymSession === "Completed") xpGain += 25; // Gym Warrior
+            if (sleepDuration) {
+                const [hours] = sleepDuration.split('h').map(Number);
+                if (hours >= 7 && hours <= 9) xpGain += 15; // Early Bird/Sleep Guardian
+            }
+
+            stats.xp += xpGain;
+            while (stats.xp >= stats.maxXp) {
+                stats.xp -= stats.maxXp;
+                stats.level += 1;
+                stats.maxXp += 50;
+            }
+            saveData();
+        }
+
+        // Update achievements progress
+        function updateAchievements() {
+            achievements.forEach(ach => {
+                if (ach.status === "IN PROGRESS") {
+                    const today = new Date().toDateString();
+                    const lastUpdate = localStorage.getItem(`last${ach.name}Update`) || '';
+                    if (lastUpdate !== today) {
+                        switch (ach.name) {
+                            case "Early Bird":
+                            case "Sleep Guardian":
+                                const [hours] = stats.sleepDuration.split('h').map(Number);
+                                if (hours >= 7 && hours <= 9) ach.progress++;
+                                break;
+                            case "Gym Warrior":
+                                if (stats.gymSession === "Completed") ach.progress++;
+                                break;
+                            case "Nutrition Master":
+                                if (parseInt(stats.calories) >= 2000) ach.progress++;
+                                break;
+                            case "Step Master":
+                                if (parseInt(stats.steps) >= 10000) ach.progress++;
+                                break;
+                            case "Digital Wellness":
+                                if (parseFloat(stats.screenTime) <= 4) ach.progress++;
+                                break;
+                        }
+                        localStorage.setItem(`last${ach.name}Update`, today);
+                    }
+                    if (ach.progress >= ach.target) {
+                        ach.status = "COMPLETED";
+                        stats.xp += ach.xp;
+                    }
+                }
+            });
+            renderAchievements();
+            saveData();
+        }
+
+        // Check and update daily achievements
+        function checkDailyAchievements() {
+            dailyAchievements.forEach(ach => {
+                if (ach.status === "IN PROGRESS" && ach.condition(stats[ach.name.split(' ')[0].toLowerCase()])) {
+                    ach.status = "COMPLETED";
+                    stats.xp += ach.xp;
+                }
+            });
+            renderDailyAchievements();
+            saveData();
+        }
+
+        // Initialize
+        loadData();
+        // Set Main tab as active by default
+        document.querySelector('.tab[data-tab="main"]').classList.add('active');
+    </script>
+</body>
+</html>
