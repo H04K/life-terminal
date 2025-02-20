@@ -8,35 +8,35 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         body {
-            background: url('https://i.imgur.com/7v0Q4rT.png') no-repeat center center fixed; /* Retro-futuristic Pip-Boy-like texture */
+            background: url('https://i.imgur.com/7v0Q4rT.png') no-repeat center center fixed; /* Retro-futuristic Pip-Boy-like metallic texture */
             background-size: cover;
             font-family: 'VT323', monospace; /* Pure terminal font, no bold/italic */
-            color: #ff9900; /* Orange text for retro-futuristic glow */
+            color: #ff9900; /* Vibrant orange for retro-futuristic glow */
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-size: 16px; /* Consistent terminal readability */
             overflow: hidden; /* Prevent scroll overflow for Pip-Boy effect */
+            filter: brightness(0.9) contrast(1.2); /* CRT-like enhancement */
         }
 
         .terminal {
-            background: rgba(0, 0, 0, 0.85); /* Slightly transparent black for Pip-Boy screen */
-            border: 3px groove #ff9900; /* Grooved border for retro-futuristic hardware */
-            padding: 15px;
-            width: 85%;
-            max-width: 850px;
-            box-shadow: 0 0 25px rgba(255, 153, 0, 0.6), inset 0 0 15px rgba(255, 153, 0, 0.4); /* Enhanced glowing edges */
+            background: rgba(0, 0, 0, 0.85); /* Semi-transparent black for Pip-Boy screen */
+            border: 4px ridge #ff9900; /* Ridged border for rugged, futuristic hardware */
+            padding: 20px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.7), inset 0 0 20px rgba(255, 153, 0, 0.5); /* Strong glowing edges */
             position: relative;
-            border-radius: 8px; /* Rounded edges for futuristic feel */
-            animation: terminalPulse 3s infinite alternate; /* Subtle pulsing animation */
+            border-radius: 10px; /* Rounded edges for futuristic flair */
+            animation: terminalGlow 4s infinite alternate; /* Pulsing holographic glow */
         }
 
-        @keyframes terminalPulse {
-            0% { box-shadow: 0 0 20px rgba(255, 153, 0, 0.5), inset 0 0 10px rgba(255, 153, 0, 0.3); }
-            100% { box-shadow: 0 0 30px rgba(255, 153, 0, 0.8), inset 0 0 20px rgba(255, 153, 0, 0.6); }
+        @keyframes terminalGlow {
+            0% { box-shadow: 0 0 25px rgba(255, 153, 0, 0.6), inset 0 0 15px rgba(255, 153, 0, 0.4); }
+            100% { box-shadow: 0 0 40px rgba(255, 153, 0, 0.9), inset 0 0 25px rgba(255, 153, 0, 0.7); }
         }
 
         .terminal::before {
@@ -46,23 +46,35 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle, rgba(255, 153, 0, 0.1) 0%, transparent 70%);
-            pointer-events: none; /* Radial glow for Pip-Boy hologram effect */
+            background: radial-gradient(circle, rgba(255, 153, 0, 0.15) 0%, transparent 80%);
+            pointer-events: none; /* Holographic radial glow */
         }
 
         .header {
             text-align: right;
-            font-size: 12px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px rgba(255, 153, 0, 0.7); /* Glowing text */
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px rgba(255, 153, 0, 0.8); /* Enhanced glowing text */
+            animation: headerBlink 2s infinite alternate; /* Subtle blink */
+        }
+
+        @keyframes headerBlink {
+            0% { opacity: 1; }
+            100% { opacity: 0.8; }
         }
 
         .user-info {
-            margin-bottom: 15px;
-            border: 2px groove #ff9900; /* Grooved border for Pip-Boy panel */
-            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px ridge #ff9900; /* Ridged for rugged Pip-Boy panel */
+            padding: 12px;
             background: rgba(0, 0, 0, 0.6);
-            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3);
+            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.4);
+            animation: infoPulse 3s infinite alternate; /* Gentle pulsing */
+        }
+
+        @keyframes infoPulse {
+            0% { box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.4); }
+            100% { box-shadow: inset 0 0 15px rgba(255, 153, 0, 0.6); }
         }
 
         .content {
@@ -76,79 +88,87 @@
 
         .section {
             margin-bottom: 15px;
-            border: 2px groove #ff9900; /* Grooved border for Pip-Boy panels */
-            padding: 12px;
+            border: 2px ridge #ff9900; /* Ridged for Pip-Boy panels */
+            padding: 15px;
             background: rgba(0, 0, 0, 0.65); /* Darker for depth */
-            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.2);
-            animation: panelFade 1.5s infinite alternate; /* Subtle fade animation */
+            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.3);
+            animation: sectionFade 2s infinite alternate; /* Smooth fade */
         }
 
-        @keyframes panelFade {
-            0% { box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.2); }
-            100% { box-shadow: inset 0 0 12px rgba(255, 153, 0, 0.4); }
+        @keyframes sectionFade {
+            0% { box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.3); }
+            100% { box-shadow: inset 0 0 15px rgba(255, 153, 0, 0.5); }
         }
 
-        .stats-item, .log-group {
-            margin: 8px 0;
+        .stats-item, .log-group, .goal-group {
+            margin: 10px 0;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
-        .input-field {
-            width: 70%;
-            margin: 4px 0;
-            padding: 6px;
+        .input-field, .goal-input {
+            width: 65%;
+            margin: 5px 0;
+            padding: 8px;
             background: rgba(0, 0, 0, 0.4);
-            border: 1px groove #ff9900;
+            border: 2px groove #ff9900;
             color: #ff9900;
             font-family: 'VT323', monospace;
-            box-shadow: inset 0 0 6px rgba(255, 153, 0, 0.3);
-            transition: box-shadow 0.3s;
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.4);
+            transition: box-shadow 0.3s, border-color 0.3s;
         }
 
-        .input-field:focus {
-            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.6), 0 0 10px rgba(255, 153, 0, 0.5);
+        .input-field:focus, .goal-input:focus {
+            box-shadow: inset 0 0 12px rgba(255, 153, 0, 0.7), 0 0 12px rgba(255, 153, 0, 0.6);
+            border-color: #ffcc00; /* Brighter orange on focus */
             outline: none;
         }
 
-        .log-button, .toggle-button, .complete-day-button {
+        .log-button, .toggle-button, .complete-day-button, .update-goal-button {
             background: #ff6600; /* Brighter orange for Pip-Boy buttons */
-            border: 1px groove #ff9900;
-            padding: 6px 12px;
+            border: 2px ridge #ff9900;
+            padding: 8px 15px;
             cursor: pointer;
             margin-left: 10px;
             transition: background-color 0.3s, box-shadow 0.3s;
-            box-shadow: 0 0 6px rgba(255, 153, 0, 0.6);
+            box-shadow: 0 0 8px rgba(255, 153, 0, 0.7);
+            animation: buttonGlow 2s infinite alternate; /* Subtle button glow */
         }
 
-        .log-button:hover, .toggle-button:hover, .complete-day-button:hover {
+        @keyframes buttonGlow {
+            0% { box-shadow: 0 0 8px rgba(255, 153, 0, 0.7); }
+            100% { box-shadow: 0 0 12px rgba(255, 153, 0, 0.9); }
+        }
+
+        .log-button:hover, .toggle-button:hover, .complete-day-button:hover, .update-goal-button:hover {
             background: #cc5500; /* Darker orange on hover */
-            box-shadow: 0 0 12px rgba(255, 153, 0, 0.9);
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.9);
         }
 
-        .achievements-grid, .daily-achievements-grid, .history-grid {
+        .achievements-grid, .daily-achievements-grid, .history-grid, .weekly-challenge-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
 
-        .achievement, .daily-achievement, .history-entry {
+        .achievement, .daily-achievement, .history-entry, .weekly-challenge {
             background: rgba(0, 0, 0, 0.65);
-            border: 2px groove #ff9900; /* Grooved for Pip-Boy panels */
-            padding: 12px;
+            border: 2px ridge #ff9900; /* Ridged for Pip-Boy panels */
+            padding: 15px;
             text-align: center;
             font-size: 14px;
-            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3);
-            animation: itemBlink 2s infinite alternate; /* Subtle blink for data entries */
+            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.3);
+            animation: dataBlink 2.5s infinite alternate; /* Subtle data blink */
         }
 
-        @keyframes itemBlink {
-            0% { box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3); }
-            100% { box-shadow: inset 0 0 12px rgba(255, 153, 0, 0.5); }
+        @keyframes dataBlink {
+            0% { box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.3); }
+            100% { box-shadow: inset 0 0 15px rgba(255, 153, 0, 0.5); }
         }
 
         .achievement-progress {
-            margin-top: 5px;
+            margin-top: 8px;
             font-size: 12px;
         }
 
@@ -156,33 +176,39 @@
             display: flex;
             justify-content: space-around;
             margin-bottom: 15px;
-            gap: 8px;
+            gap: 10px;
             background: rgba(0, 0, 0, 0.7);
-            border: 2px groove #ff9900;
-            border-radius: 5px;
-            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.3);
+            border: 2px ridge #ff9900;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.3);
+            animation: tabPulse 3s infinite alternate; /* Pulsing tab bar */
+        }
+
+        @keyframes tabPulse {
+            0% { box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.3); }
+            100% { box-shadow: inset 0 0 15px rgba(255, 153, 0, 0.5); }
         }
 
         .tab {
             background: rgba(0, 0, 0, 0.5);
             border: none;
-            padding: 8px 18px;
+            padding: 10px 20px;
             cursor: pointer;
             flex: 1;
             text-align: center;
             transition: background-color 0.3s, box-shadow 0.3s;
-            box-shadow: inset 0 0 6px rgba(255, 153, 0, 0.2);
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.2);
         }
 
         .tab:hover {
             background: rgba(51, 51, 51, 0.7);
-            box-shadow: inset 0 0 10px rgba(255, 153, 0, 0.5);
+            box-shadow: inset 0 0 12px rgba(255, 153, 0, 0.5);
         }
 
         .tab.active {
             background: #ff9900;
             color: #000000;
-            box-shadow: inset 0 0 15px rgba(255, 153, 0, 0.8);
+            box-shadow: inset 0 0 20px rgba(255, 153, 0, 0.9);
         }
     </style>
 </head>
@@ -200,26 +226,26 @@
         </div>
 
         <div class="tabs">
-            <div class="tab" data-tab="main">MAIN</div>
-            <div class="tab" data-tab="stats">STATS</div>
-            <div class="tab" data-tab="achievements">ACHIEVEMENTS</div>
-            <div class="tab" data-tab="history">HISTORY</div>
-            <div class="tab" data-tab="settings">SETTINGS</div>
+            <div class="tab" data-tab="main">STATUS</div>
+            <div class="tab" data-tab="stats">DATA</div>
+            <div class="tab" data-tab="achievements">BADGES</div>
+            <div class="tab" data-tab="history">LOGS</div>
+            <div class="tab" data-tab="settings">CONFIG</div>
         </div>
 
         <div class="content main active">
             <div class="section">
-                <h2>LIFE STATS MONITOR</h2>
+                <h2>VITAL READOUTS</h2>
                 <div class="stats-item">Sleep Duration: <span id="sleepDuration">8h</span></div>
                 <div class="stats-item">Weight: <span id="weight">78.5</span></div>
-                <div class="stats-item">Steps: <span id="steps">8432</span></div>
-                <div class="stats-item">Calories: <span id="calories">2100</span></div>
+                <div class="stats-item">Steps: <span id="steps">8432</span> / <span id="stepsGoal">10000</span></div>
+                <div class="stats-item">Calories: <span id="calories">2100</span> / <span id="caloriesGoal">2000</span></div>
                 <div class="stats-item">Screen Time: <span id="screenTime">5.2</span></div>
                 <div class="stats-item">Gym Session: <span id="gymSession">Completed</span></div>
             </div>
 
             <div class="section">
-                <h2>INPUT CONSOLE</h2>
+                <h2>INPUT MODULE</h2>
                 <div class="log-group">
                     <input type="text" class="input-field" id="logSleepDuration" placeholder="Sleep Duration (hh)">
                     <button class="log-button" onclick="logStat('sleepDuration')">LOG</button>
@@ -241,11 +267,11 @@
                     <button class="log-button" onclick="logStat('screenTime')">LOG</button>
                 </div>
                 <button class="toggle-button" onclick="toggleGymSession()">TOGGLE GYM SESSION</button>
-                <button class="complete-day-button" onclick="completeDay()">COMPLETE DAY</button>
+                <button class="complete-day-button" onclick="completeDay()">FINALIZE DAY</button>
             </div>
 
             <div class="section">
-                <h2>DAILY ACHIEVEMENTS</h2>
+                <h2>DAILY OBJECTIVES</h2>
                 <div class="daily-achievements-grid" id="dailyAchievementsList">
                     <!-- Daily achievements will be populated via JavaScript -->
                 </div>
@@ -254,14 +280,17 @@
 
         <div class="content stats">
             <div class="section">
-                <h2>STATS</h2>
-                <p>Steps: <span id="statsSteps">8432</span> | Calories: <span id="statsCalories">2100</span> | Sleep: <span id="statsSleep">8h</span> | XP: <span id="statsXp">0</span></p>
+                <h2>ANALYTICS HUB</h2>
+                <p>Steps: <span id="statsSteps">8432</span> / <span id="statsStepsGoal">10000</span> | 
+                   Calories: <span id="statsCalories">2100</span> / <span id="statsCaloriesGoal">2000</span> | 
+                   Sleep: <span id="statsSleep">8h</span> / <span id="statsSleepGoal">8h</span> | 
+                   XP: <span id="statsXp">0</span></p>
             </div>
         </div>
 
         <div class="content achievements">
             <div class="section">
-                <h2>ACHIEVEMENTS</h2>
+                <h2>BADGE ARCHIVE</h2>
                 <div class="achievements-grid" id="achievementsList">
                     <!-- Achievements will be populated via JavaScript -->
                 </div>
@@ -270,7 +299,7 @@
 
         <div class="content history">
             <div class="section">
-                <h2>HISTORY</h2>
+                <h2>LOG ARCHIVES</h2>
                 <div class="history-grid" id="historyList">
                     <!-- History entries will be populated via JavaScript -->
                 </div>
@@ -279,13 +308,34 @@
 
         <div class="content settings">
             <div class="section">
-                <h2>SETTINGS</h2>
-                <p>Profile Creation/Update:</p>
+                <h2>CONFIG TERMINAL</h2>
+                <p>Profile Setup:</p>
                 <input type="text" class="input-field" id="editName" placeholder="Enter/Update Name">
                 <button class="log-button" onclick="updateUserProfile('name')">UPDATE NAME</button>
                 <input type="number" class="input-field" id="editAge" placeholder="Enter/Update Age">
                 <button class="log-button" onclick="updateUserProfile('age')">UPDATE AGE</button>
-                <p>Theme: Dark | Notifications: On</p>
+                <h3>Daily Goals:</h3>
+                <div class="goal-group">
+                    <input type="text" class="goal-input" id="editStepsGoal" placeholder="Steps Goal (e.g., 10000)">
+                    <button class="update-goal-button" onclick="updateGoal('steps')">UPDATE</button>
+                </div>
+                <div class="goal-group">
+                    <input type="text" class="goal-input" id="editCaloriesGoal" placeholder="Calories Goal (e.g., 2000)">
+                    <button class="update-goal-button" onclick="updateGoal('calories')">UPDATE</button>
+                </div>
+                <div class="goal-group">
+                    <input type="text" class="goal-input" id="editSleepGoal" placeholder="Sleep Goal (hh, e.g., 8)">
+                    <button class="update-goal-button" onclick="updateGoal('sleep')">UPDATE</button>
+                </div>
+                <h3>Weekly Gym Challenge:</h3>
+                <div class="goal-group">
+                    <input type="text" class="goal-input" id="editGymGoal" placeholder="Gym Sessions/Week (e.g., 3)">
+                    <button class="update-goal-button" onclick="updateGoal('gym')">UPDATE</button>
+                </div>
+                <div class="weekly-challenge-grid" id="weeklyChallengeList">
+                    <!-- Weekly challenge will be populated via JavaScript -->
+                </div>
+                <p>Theme: Retro-Futuristic | Notifications: On</p>
             </div>
         </div>
     </div>
@@ -308,50 +358,65 @@
             screenTime: "5.2",
             gymSession: "Completed",
             logs: [],
-            dayCompleted: false // Track if the day is marked as finished
+            dayCompleted: false, // Track if the day is marked as finished
+            gymSessionsThisWeek: 0 // Track gym sessions for weekly challenge
+        };
+
+        let goals = {
+            steps: "10000",
+            calories: "2000",
+            sleep: "8",
+            gymWeekly: "3" // Target gym sessions per week (Monday to Sunday)
         };
 
         let achievements = [
             { name: "Early Bird", status: "IN PROGRESS", progress: 0, target: 7, xp: 20 }, // 7+ days 7-9h sleep
-            { name: "Gym Warrior", status: "IN PROGRESS", progress: 0, target: 5, xp: 25 }, // 5+ gym sessions
-            { name: "Nutrition Master", status: "IN PROGRESS", progress: 0, target: 14, xp: 15 }, // 14+ days 2000+ calories
-            { name: "Step Master", status: "IN PROGRESS", progress: 0, target: 7, xp: 20 }, // 7+ days 10000+ steps
-            { name: "Sleep Guardian", status: "IN PROGRESS", progress: 0, target: 14, xp: 15 }, // 14+ days 7-9h sleep
+            { name: "Gym Warrior", status: "IN PROGRESS", progress: 0, target: 5, xp: 25 }, // 5+ gym sessions total
+            { name: "Nutrition Master", status: "IN PROGRESS", progress: 0, target: 14, xp: 15 }, // 14+ days meeting calories goal
+            { name: "Step Master", status: "IN PROGRESS", progress: 0, target: 7, xp: 20 }, // 7+ days meeting steps goal
+            { name: "Sleep Guardian", status: "IN PROGRESS", progress: 0, target: 14, xp: 15 }, // 14+ days meeting sleep goal
             { name: "Digital Wellness", status: "IN PROGRESS", progress: 0, target: 7, xp: 10 } // 7+ days ≤4h screen
         ];
 
         let dailyAchievements = [
-            { name: "Morning Jog", status: "IN PROGRESS", xp: 20, condition: steps => parseInt(steps) >= 10000 },
-            { name: "Healthy Meal", status: "IN PROGRESS", xp: 15, condition: calories => parseInt(calories) >= 2000 },
+            { name: "Morning Jog", status: "IN PROGRESS", xp: 20, condition: steps => parseInt(steps) >= parseInt(goals.steps) },
+            { name: "Healthy Meal", status: "IN PROGRESS", xp: 15, condition: calories => parseInt(calories) >= parseInt(goals.calories) },
             { name: "Screen Break", status: "IN PROGRESS", xp: 10, condition: screenTime => parseFloat(screenTime) <= 4 }
         ];
 
         let history = []; // Array to store daily history
+        let weekStart = new Date(); // Track current week's start (Monday)
+        weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1); // Set to Monday
 
         // Load or save data to localStorage
         function loadData() {
             const savedUser = localStorage.getItem('userProfile');
             const savedStats = localStorage.getItem('stats');
+            const savedGoals = localStorage.getItem('goals');
             const savedAchievements = localStorage.getItem('achievements');
             const savedDaily = localStorage.getItem('dailyAchievements');
             const savedHistory = localStorage.getItem('history');
             if (savedUser) userProfile = JSON.parse(savedUser);
             if (savedStats) stats = JSON.parse(savedStats);
+            if (savedGoals) goals = JSON.parse(savedGoals);
             if (savedAchievements) achievements = JSON.parse(savedAchievements);
             if (savedDaily) {
                 dailyAchievements = JSON.parse(savedDaily);
                 checkDailyReset();
             }
             if (savedHistory) history = JSON.parse(savedHistory);
+            checkWeeklyReset();
             updateDisplay();
             renderAchievements();
             renderDailyAchievements();
             renderHistory();
+            renderWeeklyChallenge();
         }
 
         function saveData() {
             localStorage.setItem('userProfile', JSON.stringify(userProfile));
             localStorage.setItem('stats', JSON.stringify(stats));
+            localStorage.setItem('goals', JSON.stringify(goals));
             localStorage.setItem('achievements', JSON.stringify(achievements));
             localStorage.setItem('dailyAchievements', JSON.stringify(dailyAchievements));
             localStorage.setItem('history', JSON.stringify(history));
@@ -370,6 +435,18 @@
             }
         }
 
+        // Check if weekly gym challenge needs to reset
+        function checkWeeklyReset() {
+            const now = new Date();
+            const currentWeekStart = new Date(weekStart);
+            if (now.getTime() >= currentWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000) { // 7 days later
+                stats.gymSessionsThisWeek = 0; // Reset weekly gym sessions
+                weekStart = new Date(now);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1); // Reset to Monday
+                saveData();
+            }
+        }
+
         // Update display for stats and user info
         function updateDisplay() {
             document.getElementById('userName').textContent = userProfile.name || 'Default User';
@@ -379,14 +456,19 @@
             document.getElementById('sleepDuration').textContent = stats.sleepDuration || '8h';
             document.getElementById('weight').textContent = stats.weight || '--';
             document.getElementById('steps').textContent = stats.steps || '0';
+            document.getElementById('stepsGoal').textContent = goals.steps;
             document.getElementById('calories').textContent = stats.calories || '0';
+            document.getElementById('caloriesGoal').textContent = goals.calories;
             document.getElementById('screenTime').textContent = stats.screenTime || '0';
             document.getElementById('gymSession').textContent = stats.gymSession || 'Not Completed';
             
             // Update stats tab
             document.getElementById('statsSteps').textContent = stats.steps || '0';
+            document.getElementById('statsStepsGoal').textContent = goals.steps;
             document.getElementById('statsCalories').textContent = stats.calories || '0';
+            document.getElementById('statsCaloriesGoal').textContent = goals.calories;
             document.getElementById('statsSleep').textContent = stats.sleepDuration || '8h';
+            document.getElementById('statsSleepGoal').textContent = goals.sleep;
             document.getElementById('statsXp').textContent = stats.xp || '0';
         }
 
@@ -462,8 +544,18 @@
                     historyList.appendChild(div);
                 });
             } else if (!stats.dayCompleted) {
-                historyList.innerHTML = 'No history available. Complete the day to save today\'s stats.';
+                historyList.innerHTML = 'No logs available. Finalize the day to save today\'s data.';
             }
+        }
+
+        // Render weekly gym challenge
+        function renderWeeklyChallenge() {
+            const challengeList = document.getElementById('weeklyChallengeList');
+            challengeList.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = 'weekly-challenge';
+            div.innerHTML = `Weekly Gym Goal: ${stats.gymSessionsThisWeek}/${goals.gymWeekly} sessions\nWeek: ${weekStart.toDateString()} - ${new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toDateString()}`;
+            challengeList.appendChild(div);
         }
 
         // Tab switching
@@ -488,6 +580,9 @@
             if (value) {
                 stats[statType] = value + (statType === 'sleepDuration' ? 'h' : '');
                 stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: statType, value });
+                if (statType === 'gymSession' && stats.gymSession === "Completed") {
+                    stats.gymSessionsThisWeek++;
+                }
                 awardXp(statType === 'steps' ? value : null,
                         statType === 'calories' ? value : null,
                         statType === 'screenTime' ? value : null,
@@ -498,17 +593,22 @@
                 updateDisplay();
                 updateAchievements();
                 checkDailyAchievements();
+                renderWeeklyChallenge();
             }
         }
 
         function toggleGymSession() {
             stats.gymSession = stats.gymSession === "Completed" ? "Not Completed" : "Completed";
             stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: "gymSession", value: stats.gymSession });
+            if (stats.gymSession === "Completed") {
+                stats.gymSessionsThisWeek++;
+            }
             awardXp(null, null, null, stats.gymSession);
             saveData();
             updateDisplay();
             updateAchievements();
             checkDailyAchievements();
+            renderWeeklyChallenge();
         }
 
         // Update user profile
@@ -521,6 +621,24 @@
                 document.getElementById(inputId).value = '';
                 saveData();
                 updateDisplay();
+            }
+        }
+
+        // Update goals
+        function updateGoal(goalType) {
+            const inputId = `edit${goalType.charAt(0).toUpperCase() + goalType.slice(1)}Goal`;
+            const value = document.getElementById(inputId).value;
+            if (value) {
+                if (goalType === 'steps' || goalType === 'calories') goals[goalType] = value;
+                else if (goalType === 'sleep') goals.sleep = value + 'h';
+                else if (goalType === 'gym') goals.gymWeekly = value;
+                document.getElementById(inputId).value = '';
+                saveData();
+                updateDisplay();
+                // Update daily achievement conditions
+                dailyAchievements[0].condition = steps => parseInt(steps) >= parseInt(goals.steps);
+                dailyAchievements[1].condition = calories => parseInt(calories) >= parseInt(goals.calories);
+                dailyAchievements[2].condition = screenTime => parseFloat(screenTime) <= 4; // Screen Break unchanged
             }
         }
 
@@ -545,7 +663,7 @@
             renderHistory();
         }
 
-        // Calculate sleep duration (simplified for logging, no wake/sleep time needed)
+        // Calculate sleep duration (simplified for logging)
         function calculateSleepDuration(duration) {
             return duration + 'h'; // Assume input is hours, append 'h' for consistency
         }
@@ -553,13 +671,14 @@
         // Award XP and update achievements
         function awardXp(steps = null, calories = null, screenTime = null, gymSession = null, sleepDuration = null) {
             let xpGain = 0;
-            if (steps && parseInt(steps) >= 10000) xpGain += 20; // Step Master
-            if (calories && parseInt(calories) >= 2000) xpGain += 15; // Nutrition
+            if (steps && parseInt(steps) >= parseInt(goals.steps)) xpGain += 20; // Step Master (based on goal)
+            if (calories && parseInt(calories) >= parseInt(goals.calories)) xpGain += 15; // Nutrition (based on goal)
             if (screenTime && parseFloat(screenTime) <= 4) xpGain += 10; // Digital Wellness
             if (gymSession === "Completed") xpGain += 25; // Gym Warrior
             if (sleepDuration) {
                 const [hours] = sleepDuration.split('h').map(Number);
-                if (hours >= 7 && hours <= 9) xpGain += 15; // Early Bird/Sleep Guardian
+                const sleepGoal = parseInt(goals.sleep);
+                if (hours >= 7 && hours <= 9 && hours === sleepGoal) xpGain += 15; // Early Bird/Sleep Guardian (based on goal)
             }
 
             stats.xp += xpGain;
@@ -582,16 +701,16 @@
                             case "Early Bird":
                             case "Sleep Guardian":
                                 const [hours] = stats.sleepDuration.split('h').map(Number);
-                                if (hours >= 7 && hours <= 9) ach.progress++;
+                                if (hours >= 7 && hours <= 9 && hours === parseInt(goals.sleep)) ach.progress++;
                                 break;
                             case "Gym Warrior":
                                 if (stats.gymSession === "Completed") ach.progress++;
                                 break;
                             case "Nutrition Master":
-                                if (parseInt(stats.calories) >= 2000) ach.progress++;
+                                if (parseInt(stats.calories) >= parseInt(goals.calories)) ach.progress++;
                                 break;
                             case "Step Master":
-                                if (parseInt(stats.steps) >= 10000) ach.progress++;
+                                if (parseInt(stats.steps) >= parseInt(goals.steps)) ach.progress++;
                                 break;
                             case "Digital Wellness":
                                 if (parseFloat(stats.screenTime) <= 4) ach.progress++;
@@ -600,6 +719,11 @@
                         localStorage.setItem(`last${ach.name}Update`, today);
                     }
                     if (ach.progress >= ach.target) {
+                        ach.status = "COMPLETED";
+                        stats.xp += ach.xp;
+                    }
+                    // Check weekly gym challenge for Gym Warrior
+                    if (ach.name === "Gym Warrior" && stats.gymSessionsThisWeek >= parseInt(goals.gymWeekly)) {
                         ach.status = "COMPLETED";
                         stats.xp += ach.xp;
                     }
