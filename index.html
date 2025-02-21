@@ -21,14 +21,20 @@
             font-size: 16px; /* Consistent terminal readability */
         }
 
-        .terminal {
-            background-color: #000000; /* Solid black for terminal screen */
+        .terminal, .login-screen, .loading {
+            background-color: #000000; /* Solid black for all screens */
             border: 2px solid #ff9900; /* Orange border for terminal edge */
             padding: 15px;
             width: 80%;
             max-width: 800px;
             box-shadow: 0 0 10px #ff9900; /* Subtle glow */
             position: relative;
+            transition: opacity 0.3s ease; /* Smooth transition for all screens */
+        }
+
+        .terminal.hidden, .login-screen.hidden, .loading.hidden {
+            opacity: 0;
+            pointer-events: none; /* Prevent interactions during transitions */
         }
 
         .header {
@@ -133,22 +139,27 @@
             color: #000000;
         }
 
-        .login-screen {
+        .login-screen, .loading {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #ff9900;
-            padding: 20px;
-            box-shadow: 0 0 15px #ff9900;
             z-index: 1000;
         }
 
-        .login-screen .input-field {
+        .login-screen.active, .loading.active {
+            display: block;
+        }
+
+        .login-screen .input-field, .loading p {
             width: 80%;
             margin: 10px 0;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ff9900;
+            color: #ff9900;
+            font-family: 'VT323', monospace;
         }
 
         .login-screen button {
@@ -164,22 +175,14 @@
             background: #cc5500;
         }
 
-        .loading {
+        .error-message {
+            color: #ff3333; /* Red for errors */
+            margin-top: 10px;
             display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #ff9900;
-            padding: 20px;
-            box-shadow: 0 0 15px #ff9900;
-            z-index: 1000;
         }
 
-        .loading p {
-            color: #ff9900;
-            font-family: 'VT323', monospace;
+        .form-group {
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -314,16 +317,26 @@
 
     <div class="login-screen" id="loginScreen">
         <h2>LOGIN</h2>
-        <input type="text" class="input-field" id="loginUsername" placeholder="Email">
-        <input type="password" class="input-field" id="loginPassword" placeholder="Password">
+        <div class="form-group">
+            <input type="text" class="input-field" id="loginUsername" placeholder="Email" required>
+            <div class="error-message" id="loginError">Invalid email or password.</div>
+        </div>
+        <div class="form-group">
+            <input type="password" class="input-field" id="loginPassword" placeholder="Password" required>
+        </div>
         <button onclick="window.login()">LOGIN</button>
         <button onclick="window.showRegister()">REGISTER</button>
     </div>
 
     <div class="login-screen" id="registerScreen" style="display: none;">
         <h2>REGISTER</h2>
-        <input type="text" class="input-field" id="registerUsername" placeholder="Email">
-        <input type="password" class="input-field" id="registerPassword" placeholder="Password">
+        <div class="form-group">
+            <input type="text" class="input-field" id="registerUsername" placeholder="Email" required>
+            <div class="error-message" id="registerError">Email already in use or invalid format.</div>
+        </div>
+        <div class="form-group">
+            <input type="password" class="input-field" id="registerPassword" placeholder="Password" required>
+        </div>
         <button onclick="window.register()">REGISTER</button>
         <button onclick="window.showLogin()">BACK TO LOGIN</button>
     </div>
@@ -400,26 +413,42 @@
         let weekStart = new Date();
         weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
 
-        // Show loading screen
+        // Screen management functions
+        function showScreen(screenId, hideOthers = true) {
+            const screens = ['terminal', 'loginScreen', 'registerScreen', 'loadingScreen'];
+            screens.forEach(id => {
+                const screen = document.getElementById(id);
+                if (id === screenId) {
+                    screen.classList.add('active');
+                    screen.classList.remove('hidden');
+                    setTimeout(() => screen.style.opacity = '1', 0); // Ensure visibility
+                } else if (hideOthers) {
+                    screen.classList.remove('active');
+                    screen.style.opacity = '0';
+                    screen.classList.add('hidden');
+                }
+            });
+        }
+
         function showLoading() {
-            document.getElementById('loadingScreen').style.display = 'block';
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('terminal').style.display = 'none';
-            document.getElementById('registerScreen').style.display = 'none';
+            showScreen('loadingScreen', false);
         }
 
-        // Hide loading screen
         function hideLoading() {
-            document.getElementById('loadingScreen').style.display = 'none';
+            const loading = document.getElementById('loadingScreen');
+            loading.classList.remove('active');
+            loading.classList.add('hidden');
+            loading.style.opacity = '0';
         }
 
-        // Load or save data to Firestore
-        function loadData() {
+        // Load or save data to Firestore with async/await for smoother handling
+        async function loadData() {
             showLoading();
             const user = auth.currentUser;
             if (user) {
-                const userDoc = doc(db, 'users', user.uid);
-                getDoc(userDoc).then((docSnap) => {
+                try {
+                    const userDoc = doc(db, 'users', user.uid);
+                    const docSnap = await getDoc(userDoc);
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         userProfile = data.userProfile || userProfile;
@@ -436,43 +465,50 @@
                         renderHistory();
                         renderWeeklyChallenge();
                     } else {
-                        saveData(); // Initialize new user data if none exists
+                        await saveData(); // Initialize new user data if none exists
                     }
-                    hideLoading();
-                }).catch((error) => {
+                } catch (error) {
                     console.error("Error loading data:", error);
-                    alert("Failed to load data. Please try again or check your internet connection.");
+                    alert("Failed to load data. Please check your internet connection or try again later.");
+                } finally {
                     hideLoading();
-                });
+                    showScreen('terminal');
+                }
             } else {
                 hideLoading();
+                showScreen('loginScreen');
             }
+            return Promise.resolve();
         }
 
-        function saveData() {
+        async function saveData() {
             showLoading();
             const user = auth.currentUser;
             if (user) {
-                const userDoc = doc(db, 'users', user.uid);
-                setDoc(userDoc, {
-                    userProfile: userProfile,
-                    stats: stats,
-                    goals: goals,
-                    achievements: achievements,
-                    dailyAchievements: dailyAchievements,
-                    history: history
-                }, { merge: true }).then(() => {
+                try {
+                    const userDoc = doc(db, 'users', user.uid);
+                    await setDoc(userDoc, {
+                        userProfile: userProfile,
+                        stats: stats,
+                        goals: goals,
+                        achievements: achievements,
+                        dailyAchievements: dailyAchievements,
+                        history: history
+                    }, { merge: true });
                     console.log("Data saved successfully");
-                    hideLoading();
-                }).catch((error) => {
+                } catch (error) {
                     console.error("Error saving data:", error);
-                    alert("Failed to save data. Please try again or check your internet connection.");
+                    alert("Failed to save data. Please check your internet connection or try again later.");
+                    throw error;
+                } finally {
                     hideLoading();
-                });
+                }
             } else {
                 hideLoading();
-                window.showLogin();
+                showScreen('loginScreen');
+                throw new Error("User not authenticated");
             }
+            return Promise.resolve();
         }
 
         // Check if daily achievements need to reset
@@ -613,257 +649,6 @@
             challengeList.appendChild(div);
         }
 
-        // Intuitive logging system
-        window.logStat = function(statType) {
-            if (!auth.currentUser) {
-                window.showLogin();
-                return;
-            }
-            showLoading();
-            const inputId = `log${statType.charAt(0).toUpperCase() + statType.slice(1)}`;
-            const value = document.getElementById(inputId).value;
-            if (value) {
-                stats[statType] = value + (statType === 'sleepDuration' ? 'h' : '');
-                stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: statType, value });
-                if (statType === 'gymSession' && stats.gymSession === "Completed") {
-                    stats.gymSessionsThisWeek++;
-                }
-                awardXp(statType === 'steps' ? value : null,
-                        statType === 'calories' ? value : null,
-                        statType === 'screenTime' ? value : null,
-                        statType === 'gymSession' ? stats.gymSession : null,
-                        statType === 'sleepDuration' ? value : null);
-                document.getElementById(inputId).value = '';
-                saveData().then(() => {
-                    updateDisplay();
-                    updateAchievements();
-                    checkDailyAchievements();
-                    renderWeeklyChallenge();
-                    hideLoading();
-                }).catch(() => hideLoading());
-            } else {
-                hideLoading();
-            }
-        };
-
-        window.toggleGymSession = function() {
-            if (!auth.currentUser) {
-                window.showLogin();
-                return;
-            }
-            showLoading();
-            stats.gymSession = stats.gymSession === "Completed" ? "Not Completed" : "Completed";
-            stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: "gymSession", value: stats.gymSession });
-            if (stats.gymSession === "Completed") {
-                stats.gymSessionsThisWeek++;
-            }
-            awardXp(null, null, null, stats.gymSession);
-            saveData().then(() => {
-                updateDisplay();
-                updateAchievements();
-                checkDailyAchievements();
-                renderWeeklyChallenge();
-                hideLoading();
-            }).catch(() => hideLoading());
-        };
-
-        // Update user profile
-        window.updateUserProfile = function(field) {
-            if (!auth.currentUser) {
-                window.showLogin();
-                return;
-            }
-            showLoading();
-            const inputId = `edit${field.charAt(0).toUpperCase() + field.slice(1)}`;
-            const value = document.getElementById(inputId).value;
-            if (value) {
-                if (field === 'name') userProfile.name = value;
-                else if (field === 'age') userProfile.age = parseInt(value) || userProfile.age;
-                document.getElementById(inputId).value = '';
-                saveData().then(() => {
-                    updateDisplay();
-                    hideLoading();
-                }).catch(() => hideLoading());
-            } else {
-                hideLoading();
-            }
-        };
-
-        // Update goals
-        window.updateGoal = function(goalType) {
-            if (!auth.currentUser) {
-                window.showLogin();
-                return;
-            }
-            showLoading();
-            const inputId = `edit${goalType.charAt(0).toUpperCase() + goalType.slice(1)}Goal`;
-            const value = document.getElementById(inputId).value;
-            if (value) {
-                if (goalType === 'steps' || goalType === 'calories') goals[goalType] = value;
-                else if (goalType === 'sleep') goals.sleep = value + 'h';
-                else if (goalType === 'gym') goals.gymWeekly = value;
-                document.getElementById(inputId).value = '';
-                saveData().then(() => {
-                    updateDisplay();
-                    // Update daily achievement conditions as strings
-                    dailyAchievements[0].condition = `steps >= ${goals.steps}`;
-                    dailyAchievements[1].condition = `calories >= ${goals.calories}`;
-                    dailyAchievements[2].condition = `screenTime <= 4`; // Screen Break unchanged
-                    updateAchievements(); // Re-evaluate achievements based on new goals
-                    hideLoading();
-                }).catch(() => hideLoading());
-            } else {
-                hideLoading();
-            }
-        };
-
-        // Complete day and save history
-        window.completeDay = function() {
-            if (!auth.currentUser) {
-                window.showLogin();
-                return;
-            }
-            showLoading();
-            const today = new Date().toDateString();
-            const dailyEntry = {
-                date: today,
-                sleepDuration: stats.sleepDuration,
-                weight: stats.weight,
-                steps: stats.steps,
-                calories: stats.calories,
-                screenTime: stats.screenTime,
-                gymSession: stats.gymSession
-            };
-            history.push(dailyEntry);
-            stats.logs = [];
-            stats.dayCompleted = true;
-            stats.gymSession = "Not Completed";
-            checkDailyReset();
-            saveData().then(() => {
-                updateDisplay();
-                renderHistory();
-                hideLoading();
-            }).catch(() => hideLoading());
-        };
-
-        // Login and registration functions
-        window.login = function() {
-            showLoading();
-            const email = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    loadData().then(() => {
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('terminal').style.display = 'block';
-                        updateDisplay();
-                        hideLoading();
-                    });
-                })
-                .catch((error) => {
-                    alert("Login failed: " + error.message);
-                    hideLoading();
-                });
-        };
-
-        window.showRegister = function() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('registerScreen').style.display = 'block';
-        };
-
-        window.register = function() {
-            showLoading();
-            const email = document.getElementById('registerUsername').value;
-            const password = document.getElementById('registerPassword').value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    setDoc(doc(db, 'users', user.uid), {
-                        userProfile: { name: email.split('@')[0], age: 25 },
-                        stats: {
-                            level: 1,
-                            xp: 0,
-                            maxXp: 100,
-                            sleepDuration: "8h",
-                            weight: "78.5",
-                            steps: "8432",
-                            calories: "2100",
-                            screenTime: "5.2",
-                            gymSession: "Completed",
-                            logs: [],
-                            dayCompleted: false,
-                            gymSessionsThisWeek: 0
-                        },
-                        goals: {
-                            steps: "10000",
-                            calories: "2000",
-                            sleep: "8",
-                            gymWeekly: "3"
-                        },
-                        achievements: [
-                            { name: "Early Bird", status: "IN PROGRESS" },
-                            { name: "Gym Warrior", status: "IN PROGRESS" },
-                            { name: "Nutrition Master", status: "IN PROGRESS" },
-                            { name: "Step Master", status: "IN PROGRESS" },
-                            { name: "Sleep Guardian", status: "IN PROGRESS" },
-                            { name: "Digital Wellness", status: "IN PROGRESS" }
-                        ],
-                        dailyAchievements: [
-                            { name: "Morning Jog", status: "IN PROGRESS", xp: 20, condition: "steps >= 10000" },
-                            { name: "Healthy Meal", status: "IN PROGRESS", xp: 15, condition: "calories >= 2000" },
-                            { name: "Screen Break", status: "IN PROGRESS", xp: 10, condition: "screenTime <= 4" }
-                        ],
-                        history: []
-                    }).then(() => {
-                        userProfile = { name: email.split('@')[0], age: 25 };
-                        document.getElementById('registerScreen').style.display = 'none';
-                        document.getElementById('loginScreen').style.display = 'block';
-                        updateDisplay();
-                        hideLoading();
-                    });
-                })
-                .catch((error) => {
-                    alert("Registration failed: " + error.message);
-                    hideLoading();
-                });
-        };
-
-        window.showLogin = function() {
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('registerScreen').style.display = 'none';
-            document.getElementById('terminal').style.display = 'none';
-        };
-
-        window.logout = function() {
-            showLoading();
-            signOut(auth)
-                .then(() => {
-                    userProfile = { name: "Guest", age: "N/A" };
-                    stats = {
-                        level: 1,
-                        xp: 0,
-                        maxXp: 100,
-                        sleepDuration: "8h",
-                        weight: "78.5",
-                        steps: "8432",
-                        calories: "2100",
-                        screenTime: "5.2",
-                        gymSession: "Not Completed",
-                        logs: [],
-                        dayCompleted: false,
-                        gymSessionsThisWeek: 0
-                    };
-                    updateDisplay();
-                    window.showLogin();
-                    hideLoading();
-                })
-                .catch((error) => {
-                    console.error("Logout failed:", error);
-                    alert("Logout failed. Please try again.");
-                    hideLoading();
-                });
-        };
-
         // Check and update daily achievements
         function checkDailyAchievements() {
             dailyAchievements.forEach(ach => {
@@ -954,18 +739,322 @@
             saveData();
         }
 
-        // Auth state listener
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loadData();
-                document.getElementById('terminal').style.display = 'block';
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('registerScreen').style.display = 'none';
-                document.getElementById('loadingScreen').style.display = 'none';
-            } else {
+        // Intuitive logging system
+        window.logStat = function(statType) {
+            if (!auth.currentUser) {
                 window.showLogin();
+                return;
             }
-        });
+            showLoading();
+            const inputId = `log${statType.charAt(0).toUpperCase() + statType.slice(1)}`;
+            const value = document.getElementById(inputId).value;
+            if (value && !isNaN(value)) {
+                stats[statType] = value + (statType === 'sleepDuration' ? 'h' : '');
+                stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: statType, value });
+                if (statType === 'gymSession' && stats.gymSession === "Completed") {
+                    stats.gymSessionsThisWeek++;
+                }
+                awardXp(statType === 'steps' ? value : null,
+                        statType === 'calories' ? value : null,
+                        statType === 'screenTime' ? value : null,
+                        statType === 'gymSession' ? stats.gymSession : null,
+                        statType === 'sleepDuration' ? value : null);
+                document.getElementById(inputId).value = '';
+                saveData().then(() => {
+                    updateDisplay();
+                    updateAchievements();
+                    checkDailyAchievements();
+                    renderWeeklyChallenge();
+                    hideLoading();
+                }).catch((error) => {
+                    console.error("Error saving log:", error);
+                    alert("Failed to save log. Please try again.");
+                    hideLoading();
+                });
+            } else {
+                alert("Please enter a valid number.");
+                hideLoading();
+            }
+        };
+
+        window.toggleGymSession = function() {
+            if (!auth.currentUser) {
+                window.showLogin();
+                return;
+            }
+            showLoading();
+            stats.gymSession = stats.gymSession === "Completed" ? "Not Completed" : "Completed";
+            stats.logs.push({ timestamp: new Date().toLocaleTimeString(), type: "gymSession", value: stats.gymSession });
+            if (stats.gymSession === "Completed") {
+                stats.gymSessionsThisWeek++;
+            }
+            awardXp(null, null, null, stats.gymSession);
+            saveData().then(() => {
+                updateDisplay();
+                updateAchievements();
+                checkDailyAchievements();
+                renderWeeklyChallenge();
+                hideLoading();
+            }).catch((error) => {
+                console.error("Error toggling gym session:", error);
+                alert("Failed to update gym session. Please try again.");
+                hideLoading();
+            });
+        };
+
+        // Update user profile
+        window.updateUserProfile = function(field) {
+            if (!auth.currentUser) {
+                window.showLogin();
+                return;
+            }
+            showLoading();
+            const inputId = `edit${field.charAt(0).toUpperCase() + field.slice(1)}`;
+            const value = document.getElementById(inputId).value;
+            if (value) {
+                if (field === 'name' && value.trim().length > 0) {
+                    userProfile.name = value.trim();
+                } else if (field === 'age' && !isNaN(value) && value > 0) {
+                    userProfile.age = parseInt(value);
+                } else {
+                    alert("Please enter a valid name or age (positive number).");
+                    hideLoading();
+                    return;
+                }
+                document.getElementById(inputId).value = '';
+                saveData().then(() => {
+                    updateDisplay();
+                    hideLoading();
+                }).catch((error) => {
+                    console.error("Error updating profile:", error);
+                    alert("Failed to update profile. Please try again.");
+                    hideLoading();
+                });
+            } else {
+                alert("Please enter a value.");
+                hideLoading();
+            }
+        };
+
+        // Update goals
+        window.updateGoal = function(goalType) {
+            if (!auth.currentUser) {
+                window.showLogin();
+                return;
+            }
+            showLoading();
+            const inputId = `edit${goalType.charAt(0).toUpperCase() + goalType.slice(1)}Goal`;
+            const value = document.getElementById(inputId).value;
+            if (value && !isNaN(value) && value > 0) {
+                if (goalType === 'steps' || goalType === 'calories' || goalType === 'gym') {
+                    goals[goalType] = value;
+                } else if (goalType === 'sleep') {
+                    goals.sleep = value;
+                }
+                document.getElementById(inputId).value = '';
+                saveData().then(() => {
+                    updateDisplay();
+                    // Update daily achievement conditions as strings
+                    dailyAchievements[0].condition = `steps >= ${goals.steps}`;
+                    dailyAchievements[1].condition = `calories >= ${goals.calories}`;
+                    dailyAchievements[2].condition = `screenTime <= 4`; // Screen Break unchanged
+                    updateAchievements(); // Re-evaluate achievements based on new goals
+                    hideLoading();
+                }).catch((error) => {
+                    console.error("Error updating goal:", error);
+                    alert("Failed to update goal. Please try again.");
+                    hideLoading();
+                });
+            } else {
+                alert("Please enter a valid positive number for the goal.");
+                hideLoading();
+            }
+        };
+
+        // Complete day and save history
+        window.completeDay = function() {
+            if (!auth.currentUser) {
+                window.showLogin();
+                return;
+            }
+            showLoading();
+            const today = new Date().toDateString();
+            const dailyEntry = {
+                date: today,
+                sleepDuration: stats.sleepDuration,
+                weight: stats.weight,
+                steps: stats.steps,
+                calories: stats.calories,
+                screenTime: stats.screenTime,
+                gymSession: stats.gymSession
+            };
+            history.push(dailyEntry);
+            stats.logs = [];
+            stats.dayCompleted = true;
+            stats.gymSession = "Not Completed";
+            checkDailyReset();
+            saveData().then(() => {
+                updateDisplay();
+                renderHistory();
+                hideLoading();
+            }).catch((error) => {
+                console.error("Error completing day:", error);
+                alert("Failed to complete day. Please try again.");
+                hideLoading();
+            });
+        };
+
+        // Login and registration functions with validation
+        window.login = function() {
+            showLoading();
+            const email = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) {
+                alert("Please enter both email and password.");
+                hideLoading();
+                return;
+            }
+            if (!isValidEmail(email)) {
+                document.getElementById('loginError').style.display = 'block';
+                hideLoading();
+                return;
+            }
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    loadData().then(() => {
+                        showScreen('terminal');
+                        updateDisplay();
+                        document.getElementById('loginError').style.display = 'none';
+                        hideLoading();
+                    });
+                })
+                .catch((error) => {
+                    console.error("Login error:", error);
+                    document.getElementById('loginError').style.display = 'block';
+                    alert("Login failed: " + error.message);
+                    hideLoading();
+                });
+        };
+
+        window.showRegister = function() {
+            showScreen('registerScreen');
+            document.getElementById('registerError').style.display = 'none';
+        };
+
+        window.register = function() {
+            showLoading();
+            const email = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            if (!email || !password) {
+                alert("Please enter both email and password.");
+                hideLoading();
+                return;
+            }
+            if (!isValidEmail(email)) {
+                document.getElementById('registerError').style.display = 'block';
+                hideLoading();
+                return;
+            }
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long.");
+                hideLoading();
+                return;
+            }
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    setDoc(doc(db, 'users', user.uid), {
+                        userProfile: { name: email.split('@')[0], age: 25 },
+                        stats: {
+                            level: 1,
+                            xp: 0,
+                            maxXp: 100,
+                            sleepDuration: "8h",
+                            weight: "78.5",
+                            steps: "8432",
+                            calories: "2100",
+                            screenTime: "5.2",
+                            gymSession: "Completed",
+                            logs: [],
+                            dayCompleted: false,
+                            gymSessionsThisWeek: 0
+                        },
+                        goals: {
+                            steps: "10000",
+                            calories: "2000",
+                            sleep: "8",
+                            gymWeekly: "3"
+                        },
+                        achievements: [
+                            { name: "Early Bird", status: "IN PROGRESS" },
+                            { name: "Gym Warrior", status: "IN PROGRESS" },
+                            { name: "Nutrition Master", status: "IN PROGRESS" },
+                            { name: "Step Master", status: "IN PROGRESS" },
+                            { name: "Sleep Guardian", status: "IN PROGRESS" },
+                            { name: "Digital Wellness", status: "IN PROGRESS" }
+                        ],
+                        dailyAchievements: [
+                            { name: "Morning Jog", status: "IN PROGRESS", xp: 20, condition: "steps >= 10000" },
+                            { name: "Healthy Meal", status: "IN PROGRESS", xp: 15, condition: "calories >= 2000" },
+                            { name: "Screen Break", status: "IN PROGRESS", xp: 10, condition: "screenTime <= 4" }
+                        ],
+                        history: []
+                    }).then(() => {
+                        userProfile = { name: email.split('@')[0], age: 25 };
+                        showScreen('loginScreen');
+                        updateDisplay();
+                        document.getElementById('registerError').style.display = 'none';
+                        hideLoading();
+                    });
+                })
+                .catch((error) => {
+                    console.error("Registration error:", error);
+                    document.getElementById('registerError').style.display = 'block';
+                    alert("Registration failed: " + error.message);
+                    hideLoading();
+                });
+        };
+
+        window.showLogin = function() {
+            showScreen('loginScreen');
+            document.getElementById('loginError').style.display = 'none';
+        };
+
+        window.logout = function() {
+            showLoading();
+            signOut(auth)
+                .then(() => {
+                    userProfile = { name: "Guest", age: "N/A" };
+                    stats = {
+                        level: 1,
+                        xp: 0,
+                        maxXp: 100,
+                        sleepDuration: "8h",
+                        weight: "78.5",
+                        steps: "8432",
+                        calories: "2100",
+                        screenTime: "5.2",
+                        gymSession: "Not Completed",
+                        logs: [],
+                        dayCompleted: false,
+                        gymSessionsThisWeek: 0
+                    };
+                    updateDisplay();
+                    window.showLogin();
+                    hideLoading();
+                })
+                .catch((error) => {
+                    console.error("Logout failed:", error);
+                    alert("Logout failed. Please try again.");
+                    hideLoading();
+                });
+        };
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
 
         // Tab switching (with login check)
         const tabs = document.querySelectorAll('.tab');
@@ -983,6 +1072,22 @@
                 const tabId = tab.getAttribute('data-tab');
                 document.querySelector(`.content.${tabId}`).classList.add('active');
                 console.log(`Switched to ${tabId} tab at ${new Date().toLocaleTimeString()}`);
+            });
+        });
+
+        // Ensure login screen shows on load if not authenticated
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoading();
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loadData().then(() => {
+                        showScreen('terminal');
+                        hideLoading();
+                    });
+                } else {
+                    hideLoading();
+                    showScreen('loginScreen');
+                }
             });
         });
 
