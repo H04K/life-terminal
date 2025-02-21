@@ -1,1 +1,40 @@
-
+{
+    "userProfile": {
+        "name": "Default User",
+        "age": 30
+    },
+    "stats": {
+        "level": 1,
+        "xp": 0,
+        "maxXp": 100,
+        "sleepDuration": "8h",
+        "weight": "78.5",
+        "steps": "8432",
+        "calories": "2100",
+        "screenTime": "5.2",
+        "gymSession": "Completed",
+        "logs": [],
+        "dayCompleted": false,
+        "gymSessionsThisWeek": 0
+    },
+    "goals": {
+        "steps": "10000",
+        "calories": "2000",
+        "sleep": "8",
+        "gymWeekly": "3"
+    },
+    "achievements": [
+        { "name": "Early Bird", "status": "IN PROGRESS" },
+        { "name": "Gym Warrior", "status": "IN PROGRESS" },
+        { "name": "Nutrition Master", "status": "IN PROGRESS" },
+        { "name": "Step Master", "status": "IN PROGRESS" },
+        { "name": "Sleep Guardian", "status": "IN PROGRESS" },
+        { "name": "Digital Wellness", "status": "IN PROGRESS" }
+    ],
+    "dailyAchievements": [
+        { "name": "Morning Jog", "status": "IN PROGRESS", "xp": 20, "condition": "steps >= 10000" },
+        { "name": "Healthy Meal", "status": "IN PROGRESS", "xp": 15, "condition": "calories >= 2000" },
+        { "name": "Screen Break", "status": "IN PROGRESS", "xp": 10, "condition": "screenTime <= 4" }
+    ],
+    "history": []
+}
